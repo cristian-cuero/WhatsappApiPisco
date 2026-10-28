@@ -1,0 +1,39 @@
+{
+  "name": "pisco-whatsapp-ia",
+  "version": "1.0.0",
+  "description": "Plataforma de WhatsApp con IA para Pisco",
+  "main": "app.js",
+  "scripts": {
+    "dev": "nodemon src/server/server.js",
+    "start": "node src/server/server.js",
+    "postinstall": "prisma skills sync || exit 0",
+    "contract:emit": "prisma contract emit"
+  },
+  "keywords": [
+    "pisco",
+    "whatsapp",
+    "ia",
+    "fastify"
+  ],
+  "author": "Pisco Company Tics- Cristian Cuero",
+  "license": "ISC",
+  "dependencies": {
+    "@fastify/jwt": "^10.2.2",
+    "@hapi/boom": "^10.0.1",
+    "@prisma/adapter-pg": "^7.10.0",
+    "@prisma/client": "^7.10.0",
+    "@prisma/orm-postgres": "^8.0.0-rc.14",
+    "@whiskeysockets/baileys": "^7.0.0-rc14",
+    "bcrypt": "^6.0.0",
+    "dotenv": "^18.0.6",
+    "fastify": "^5.12.5",
+    "pg": "^8.23.1",
+    "qrcode": "^1.5.4"
+  },
+  "devDependencies": {
+    "@prisma/cli-engine": "^0.6.2",
+    "@types/node": "^26.6.4",
+    "nodemon": "^3.1.14",
+    "prisma": "^7.10.0"
+  }
+}

@@ -1,0 +1,113 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Tenant {
+  id            Int      @id @default(autoincrement())
+  codigo        String   @unique @db.VarChar(50)
+  nombre        String   @db.VarChar(150)
+  estado        String   @default("ACTIVO") @db.VarChar(20)
+  fechaCreacion DateTime @default(now())
+
+      // Integración con la API de Pisco
+  apiUsername          String?  @db.VarChar(100)
+  apiPasswordEncrypted String?  @db.VarChar(500)
+  apiActivo            Boolean  @default(false)
+
+  usuarios       User[]
+  sesiones       WhatsAppSession[]
+  conversaciones Conversacion[]
+
+  @@map("tenants")
+}
+
+model User {
+  id            Int      @id @default(autoincrement())
+  usuario       String   @unique @db.VarChar(100)
+  password      String   @db.VarChar(255)
+  nombre        String?  @db.VarChar(150)
+  estado        String   @default("ACTIVO") @db.VarChar(20)
+  fechaCreacion DateTime @default(now())
+
+  tenantId Int
+  tenant   Tenant @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId])
+  @@map("usuarios")
+}
+
+model WhatsAppSession {
+  id                  Int      @id @default(autoincrement())
+  nombre              String   @db.VarChar(100)
+  telefono            String?  @db.VarChar(30)
+  provider            String   @default("BAILEYS") @db.VarChar(30)
+  estado              String   @default("CREANDO") @db.VarChar(30)
+
+  mensajeBienvenida   String?
+  mensajeDespedida    String?
+  timeoutConversacion Int      @default(2)
+  intentosInvalidos   Int      @default(3)
+
+  fechaCreacion       DateTime @default(now())
+  ultimaConexion      DateTime?
+
+  tenantId Int
+  tenant   Tenant @relation(fields: [tenantId], references: [id])
+
+  conversaciones Conversacion[]
+
+  @@index([tenantId])
+  @@map("whatsapp_sesiones")
+}
+
+model Mensaje {
+  id           Int      @id @default(autoincrement())
+  messageId    String?  @db.VarChar(150)
+  direccion    String   @db.VarChar(20)
+  tipo         String   @default("TEXT") @db.VarChar(30)
+  contenido    String?
+  fechaMensaje DateTime @default(now())
+
+
+  conversacionId Int
+  conversacion   Conversacion @relation(fields: [conversacionId], references: [id])
+
+  @@index([conversacionId])
+  @@index([messageId])
+  @@map("mensajes")
+}
+
+model Conversacion {
+  id              Int      @id @default(autoincrement())
+  telefono        String   @db.VarChar(30)
+  nombreContacto  String?  @db.VarChar(150)
+
+  estado          String   @default("ABIERTA") @db.VarChar(30)
+
+  fechaCreacion   DateTime @default(now())
+  fechaCierre     DateTime?
+  motivoCierre    String?  @db.VarChar(50)
+
+  ultimaActividad DateTime @default(now())
+
+  intentosInvalidos Int @default(0)
+  flujoPago Json?
+
+  tenantId Int
+  tenant   Tenant @relation(fields: [tenantId], references: [id])
+
+  sessionId Int
+  session   WhatsAppSession @relation(fields: [sessionId], references: [id])
+
+  mensajes Mensaje[]
+
+  @@index([tenantId])
+  @@index([sessionId])
+  @@index([telefono])
+  @@index([estado])
+  @@map("conversaciones")
+}

@@ -1,0 +1,56 @@
+
+{
+  "intenciones": {
+    "iniciar_pago": {
+      "descripcion": "Inicia el flujo de pago cuando el cliente expresa que quiere pagar una cuota, realizar un pago o generar un enlace de pago.",
+      "accion": "INICIAR_FLUJO_PAGO"
+    }
+  },
+  "consultar_contrato": {
+    "descripcion": "Consulta la información real del afiliado y su contrato en Pisco utilizando exclusivamente la cédula proporcionada explícitamente por el cliente en la conversación actual. Si no ha proporcionado su cédula, solicita primero su número de cédula.",
+    "metodo": "GET",
+    "ruta": "/api/contrato/consultaraAfiliado",
+    "parametros": {
+      "cedula": {
+        "tipo": "string",
+        "descripcion": "Número de cédula proporcionado explícitamente por el cliente.",
+        "ubicacion": "query",
+        "requerido": true,
+        "patron": "^[0-9]{5,15}$"
+      }
+    },
+    "flujoPago": {
+      "guardarResultado": "contratosConsultados",
+      "campos": {
+        "idcontrato": "idcontrato",
+        "cuota": "cuota",
+        "nombreplan": "nombreplan",
+        "estado": "estado"
+      }
+    }
+  },
+  "generar_link_pago": {
+    "descripcion": "Genera un enlace de pago para un contrato por el valor total validado por el servidor.",
+    "metodo": "POST",
+    "ruta": "/api/contrato/crearLinkPago",
+    "parametros": {
+      "contrato": {
+        "tipo": "string",
+        "descripcion": "Identificador exacto del contrato seleccionado.",
+        "ubicacion": "body",
+        "requerido": true
+      },
+      "valor": {
+        "tipo": "number",
+        "descripcion": "Valor total calculado y validado por el servidor.",
+        "ubicacion": "body",
+        "requerido": true
+      }
+    },
+    "seguridad": {
+      "requiereConfirmacion": true,
+      "requiereContratoConsultado": true,
+      "validarValorEnServidor": true
+    }
+  }
+}
